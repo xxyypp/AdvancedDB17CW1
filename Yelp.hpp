@@ -31,7 +31,7 @@ public:
 	string business_id;
 	string name;
 	string value;
-}
+};
 
 /*
 CREATE TABLE " business " (
