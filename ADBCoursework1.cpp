@@ -18,9 +18,6 @@ std::vector<std::string> findHours(odb::database& db, std::string username) {
 	transaction t(db.begin());
 	// Your implementation goes here:
 	// Find the hours
-	//while(username is not Null){
-		hours = db->(hours.hours);
-	//}
 	t.commit();
 	return result;
 }
