@@ -122,4 +122,5 @@ CREATE TABLE " user " (
 " compliment_photos " int DEFAULT NULL ,
 PRIMARY KEY ("id")
 );
+ test remotely!
 */
