@@ -25,15 +25,55 @@ public:
 // ---------------------------------------------
 
 #pragma db object
-class attribute{
+class user{
 public:
 	#pragma db id
-	string business_id;
-	string name;
-	string value;
+    	int id;
+
+	#pragma db value_not_null inverse(user_)
+    	std::vector<weak_ptr<review>> review_;
+};
+
+#pragma db object
+class review{
+public:
+    #pragma db id
+	    int id;
+	    int business_id;
+        int user_id;
+
+    #pragma db not_null
+        shared_ptr<user> user_;
+
+
 };
 
 /*
+ CREATE TABLE " user " (
+"id" varchar (22) NOT NULL ,
+" name " varchar (255) DEFAULT NULL ,
+" review_count " int DEFAULT NULL ,
+" yelping_since " datetime DEFAULT NULL ,
+" useful " int DEFAULT NULL ,
+" funny " int DEFAULT NULL ,
+" cool " int DEFAULT NULL ,
+" fans " int DEFAULT NULL ,
+" average_stars " float DEFAULT NULL ,
+" compliment_hot " int DEFAULT NULL ,
+" compliment_more " int DEFAULT NULL ,
+" compliment_profile " int DEFAULT NULL ,
+" compliment_cute " int DEFAULT NULL ,
+" compliment_list " int DEFAULT NULL ,
+" compliment_note " int DEFAULT NULL ,
+" compliment_plain " int DEFAULT NULL ,
+" compliment_cool " int DEFAULT NULL ,
+" compliment_funny " int DEFAULT NULL ,
+" compliment_writer " int DEFAULT NULL ,
+" compliment_photos " int DEFAULT NULL ,
+PRIMARY KEY ("id")
+);
+
+
 CREATE TABLE " business " (
 "id" varchar (22) NOT NULL ,
 " name " varchar (255) DEFAULT NULL ,
@@ -99,28 +139,6 @@ CREATE TABLE "tip" (
 " date " datetime DEFAULT NULL ,
 " likes " int DEFAULT NULL ,
 );
-CREATE TABLE " user " (
-"id" varchar (22) NOT NULL ,
-" name " varchar (255) DEFAULT NULL ,
-" review_count " int DEFAULT NULL ,
-" yelping_since " datetime DEFAULT NULL ,
-" useful " int DEFAULT NULL ,
-" funny " int DEFAULT NULL ,
-" cool " int DEFAULT NULL ,
-" fans " int DEFAULT NULL ,
-" average_stars " float DEFAULT NULL ,
-" compliment_hot " int DEFAULT NULL ,
-" compliment_more " int DEFAULT NULL ,
-" compliment_profile " int DEFAULT NULL ,
-" compliment_cute " int DEFAULT NULL ,
-" compliment_list " int DEFAULT NULL ,
-" compliment_note " int DEFAULT NULL ,
-" compliment_plain " int DEFAULT NULL ,
-" compliment_cool " int DEFAULT NULL ,
-" compliment_funny " int DEFAULT NULL ,
-" compliment_writer " int DEFAULT NULL ,
-" compliment_photos " int DEFAULT NULL ,
-PRIMARY KEY ("id")
-);
+
  test remotely!
 */
