@@ -3,7 +3,13 @@
 #include <odb/lazy-ptr.hxx>
 #include <set>
 #include <string>
+/*------Edit----------*/
+#include <vector>
 
+using std::vector;
+using odb::lazy_shared_ptr;
+using odb::lazy_weak_ptr;
+/*------End----------*/
 using std::string;
 
 #pragma db view
@@ -23,15 +29,25 @@ public:
 // ---------------------------------------------
 // No need to change anything above this line
 // ---------------------------------------------
+#pragma db object
+class hours{
+public:
+    #pragma db id
+        int id;
+        string hours;
+
+    #pragma db inverse(hours_)
+    lazy_weak_ptr<business> business_;
+};
 
 #pragma db object
-class user{
+class business{
 public:
-	#pragma db id
-    	int id;
+    #pragma db id
+     string city;
 
-	#pragma db value_not_null inverse(user_)
-    	std::vector<weak_ptr<review>> review_;
+    #pragma db not_null
+     lazy_shared_ptr<hours> hours_;
 };
 
 #pragma db object
@@ -43,9 +59,17 @@ public:
         int user_id;
 
     #pragma db not_null
-        shared_ptr<user> user_;
+        lazy_shared_ptr<user> user_;
+};
 
+#pragma db object
+class user{
+public:
+#pragma db id
+    int id;
 
+#pragma db value_not_null inverse(user_)
+    std::vector<lazy_weak_ptr<review> > review_;
 };
 
 /*
