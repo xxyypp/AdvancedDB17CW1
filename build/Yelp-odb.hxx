@@ -74,20 +74,62 @@ namespace odb
     callback (database&, view_type&, callback_event);
   };
 
-  // attribute
+  // review
   //
   template <>
-  struct class_traits< ::attribute >
+  struct class_traits< ::review >
   {
     static const class_kind kind = class_object;
   };
 
   template <>
-  class access::object_traits< ::attribute >
+  class access::object_traits< ::review >
   {
     public:
-    typedef ::attribute object_type;
-    typedef ::attribute* pointer_type;
+    typedef ::review object_type;
+    typedef ::review* pointer_type;
+    typedef odb::pointer_traits<pointer_type> pointer_traits;
+
+    static const bool polymorphic = false;
+
+    typedef int id_type;
+
+    static const bool auto_id = false;
+
+    static const bool abstract = false;
+
+    static id_type
+    id (const object_type&);
+
+    typedef
+    no_op_pointer_cache_traits<pointer_type>
+    pointer_cache_traits;
+
+    typedef
+    no_op_reference_cache_traits<object_type>
+    reference_cache_traits;
+
+    static void
+    callback (database&, object_type&, callback_event);
+
+    static void
+    callback (database&, const object_type&, callback_event);
+  };
+
+  // user
+  //
+  template <>
+  struct class_traits< ::user >
+  {
+    static const class_kind kind = class_object;
+  };
+
+  template <>
+  class access::object_traits< ::user >
+  {
+    public:
+    typedef ::user object_type;
+    typedef ::user* pointer_type;
     typedef odb::pointer_traits<pointer_type> pointer_traits;
 
     static const bool polymorphic = false;
@@ -250,24 +292,48 @@ namespace odb
   {
   };
 
-  // attribute
+  // review
   //
   template <typename A>
-  struct query_columns< ::attribute, id_mssql, A >
+  struct pointer_query_columns< ::review, id_mssql, A >
   {
+    // id
+    //
+    typedef
+    mssql::query_column<
+      mssql::value_traits<
+        int,
+        mssql::id_int >::query_type,
+      mssql::id_int >
+    id_type_;
+
+    static const id_type_ id;
+
     // business_id
     //
     typedef
     mssql::query_column<
       mssql::value_traits<
-        ::std::string,
-        mssql::id_string >::query_type,
-      mssql::id_string >
+        int,
+        mssql::id_int >::query_type,
+      mssql::id_int >
     business_id_type_;
 
     static const business_id_type_ business_id;
 
-    // name
+    // user_id
+    //
+    typedef
+    mssql::query_column<
+      mssql::value_traits<
+        int,
+        mssql::id_int >::query_type,
+      mssql::id_int >
+    user_id_type_;
+
+    static const user_id_type_ user_id;
+
+    // user
     //
     typedef
     mssql::query_column<
@@ -275,47 +341,34 @@ namespace odb
         ::std::string,
         mssql::id_string >::query_type,
       mssql::id_string >
-    name_type_;
+    user_type_;
 
-    static const name_type_ name;
-
-    // value
-    //
-    typedef
-    mssql::query_column<
-      mssql::value_traits<
-        ::std::string,
-        mssql::id_string >::query_type,
-      mssql::id_string >
-    value_type_;
-
-    static const value_type_ value;
+    static const user_type_ user;
   };
 
   template <typename A>
-  const typename query_columns< ::attribute, id_mssql, A >::business_id_type_
-  query_columns< ::attribute, id_mssql, A >::
-  business_id (A::table_name, "[business_id]", 0, 256);
+  const typename pointer_query_columns< ::review, id_mssql, A >::id_type_
+  pointer_query_columns< ::review, id_mssql, A >::
+  id (A::table_name, "[id]", 0);
 
   template <typename A>
-  const typename query_columns< ::attribute, id_mssql, A >::name_type_
-  query_columns< ::attribute, id_mssql, A >::
-  name (A::table_name, "[name]", 0, 512);
+  const typename pointer_query_columns< ::review, id_mssql, A >::business_id_type_
+  pointer_query_columns< ::review, id_mssql, A >::
+  business_id (A::table_name, "[business_id]", 0);
 
   template <typename A>
-  const typename query_columns< ::attribute, id_mssql, A >::value_type_
-  query_columns< ::attribute, id_mssql, A >::
-  value (A::table_name, "[value]", 0, 512);
+  const typename pointer_query_columns< ::review, id_mssql, A >::user_id_type_
+  pointer_query_columns< ::review, id_mssql, A >::
+  user_id (A::table_name, "[user_id]", 0);
 
   template <typename A>
-  struct pointer_query_columns< ::attribute, id_mssql, A >:
-    query_columns< ::attribute, id_mssql, A >
-  {
-  };
+  const typename pointer_query_columns< ::review, id_mssql, A >::user_type_
+  pointer_query_columns< ::review, id_mssql, A >::
+  user (A::table_name, "[user]", 0, 22);
 
   template <>
-  class access::object_traits_impl< ::attribute, id_mssql >:
-    public access::object_traits< ::attribute >
+  class access::object_traits_impl< ::review, id_mssql >:
+    public access::object_traits< ::review >
   {
     public:
     static const std::size_t batch = 1UL;
@@ -324,7 +377,7 @@ namespace odb
 
     struct id_image_type
     {
-      char id_value[257];
+      int id_value;
       SQLLEN id_size_ind;
 
       std::size_t version;
@@ -332,20 +385,25 @@ namespace odb
 
     struct image_type
     {
+      // id
+      //
+      int id_value;
+      SQLLEN id_size_ind;
+
       // business_id
       //
-      char business_id_value[257];
+      int business_id_value;
       SQLLEN business_id_size_ind;
 
-      // name
+      // user_id
       //
-      char name_value[513];
-      SQLLEN name_size_ind;
+      int user_id_value;
+      SQLLEN user_id_size_ind;
 
-      // value
+      // user_
       //
-      char value_value[513];
-      SQLLEN value_size_ind;
+      char user_value[23];
+      SQLLEN user_size_ind;
 
       std::size_t version;
 
@@ -359,6 +417,8 @@ namespace odb
     };
 
     struct extra_statement_cache_type;
+
+    struct user_tag;
 
     using object_traits<object_type>::id;
 
@@ -390,7 +450,7 @@ namespace odb
 
     typedef mssql::query_base query_base_type;
 
-    static const std::size_t column_count = 3UL;
+    static const std::size_t column_count = 4UL;
     static const std::size_t id_column_count = 1UL;
     static const std::size_t inverse_column_count = 0UL;
     static const std::size_t readonly_column_count = 0UL;
@@ -449,12 +509,346 @@ namespace odb
   };
 
   template <>
-  class access::object_traits_impl< ::attribute, id_common >:
-    public access::object_traits_impl< ::attribute, id_mssql >
+  class access::object_traits_impl< ::review, id_common >:
+    public access::object_traits_impl< ::review, id_mssql >
   {
   };
 
-  // attribute
+  // user
+  //
+  template <typename A>
+  struct query_columns< ::user, id_mssql, A >
+  {
+    // id
+    //
+    typedef
+    mssql::query_column<
+      mssql::value_traits<
+        ::std::string,
+        mssql::id_string >::query_type,
+      mssql::id_string >
+    id_type_;
+
+    static const id_type_ id;
+  };
+
+  template <typename A>
+  const typename query_columns< ::user, id_mssql, A >::id_type_
+  query_columns< ::user, id_mssql, A >::
+  id (A::table_name, "[id]", 0, 22);
+
+  template <typename A>
+  struct pointer_query_columns< ::user, id_mssql, A >:
+    query_columns< ::user, id_mssql, A >
+  {
+  };
+
+  template <>
+  class access::object_traits_impl< ::user, id_mssql >:
+    public access::object_traits< ::user >
+  {
+    public:
+    static const std::size_t batch = 1UL;
+
+    static const bool rowversion = false;
+
+    struct id_image_type
+    {
+      char id_value[23];
+      SQLLEN id_size_ind;
+
+      std::size_t version;
+    };
+
+    struct image_type
+    {
+      // id
+      //
+      char id_value[23];
+      SQLLEN id_size_ind;
+
+      std::size_t version;
+
+      mssql::change_callback change_callback_;
+
+      mssql::change_callback*
+      change_callback ()
+      {
+        return &change_callback_;
+      }
+    };
+
+    struct extra_statement_cache_type;
+
+    // review_
+    //
+    struct review_traits
+    {
+      static const std::size_t id_column_count = 1UL;
+      static const std::size_t data_column_count = 2UL;
+
+      static const bool versioned = false;
+
+      static const char insert_statement[];
+      static const char select_statement[];
+      static const char delete_statement[];
+
+      typedef ::std::vector< ::odb::lazy_weak_ptr< ::review > > container_type;
+      typedef
+      odb::access::container_traits<container_type>
+      container_traits_type;
+      typedef container_traits_type::index_type index_type;
+      typedef container_traits_type::value_type value_type;
+
+      typedef ordered_functions<index_type, value_type> functions_type;
+      typedef mssql::container_statements< review_traits > statements_type;
+
+      struct data_image_type
+      {
+        // value
+        //
+        int value_value;
+        SQLLEN value_size_ind;
+
+        std::size_t version;
+      };
+
+      static void
+      bind (mssql::bind*,
+            const mssql::bind* id,
+            std::size_t id_size,
+            data_image_type&);
+
+      static void
+      init (value_type&,
+            const data_image_type&,
+            database*);
+
+      static void
+      insert (index_type, const value_type&, void*);
+
+      static bool
+      select (index_type&, value_type&, void*);
+
+      static void
+      delete_ (void*);
+
+      static void
+      load (container_type&,
+            statements_type&);
+    };
+
+    using object_traits<object_type>::id;
+
+    static id_type
+    id (const image_type&);
+
+    static void
+    bind (mssql::bind*,
+          image_type&,
+          mssql::statement_kind);
+
+    static void
+    bind (mssql::bind*, id_image_type&);
+
+    static void
+    init (image_type&,
+          const object_type&,
+          mssql::statement_kind);
+
+    static void
+    init (object_type&,
+          const image_type&,
+          database*);
+
+    static void
+    init (id_image_type&, const id_type&);
+
+    typedef mssql::object_statements<object_type> statements_type;
+
+    typedef mssql::query_base query_base_type;
+
+    static const std::size_t column_count = 1UL;
+    static const std::size_t id_column_count = 1UL;
+    static const std::size_t inverse_column_count = 0UL;
+    static const std::size_t readonly_column_count = 0UL;
+    static const std::size_t managed_optimistic_column_count = 0UL;
+
+    static const std::size_t separate_load_column_count = 0UL;
+    static const std::size_t separate_update_column_count = 0UL;
+
+    static const bool versioned = false;
+
+    static const char persist_statement[];
+    static const char find_statement[];
+    static const char erase_statement[];
+    static const char query_statement[];
+    static const char erase_query_statement[];
+
+    static const char table_name[];
+
+    static void
+    persist (database&, const object_type&);
+
+    static pointer_type
+    find (database&, const id_type&);
+
+    static bool
+    find (database&, const id_type&, object_type&);
+
+    static bool
+    reload (database&, object_type&);
+
+    static void
+    update (database&, const object_type&);
+
+    static void
+    erase (database&, const id_type&);
+
+    static void
+    erase (database&, const object_type&);
+
+    static result<object_type>
+    query (database&, const query_base_type&);
+
+    static unsigned long long
+    erase_query (database&, const query_base_type&);
+
+    public:
+    static bool
+    find_ (statements_type&,
+           const id_type*);
+
+    static void
+    load_ (statements_type&,
+           object_type&,
+           bool reload);
+  };
+
+  template <>
+  class access::object_traits_impl< ::user, id_common >:
+    public access::object_traits_impl< ::user, id_mssql >
+  {
+  };
+
+  // review
+  //
+  template <>
+  struct alias_traits<
+    ::user,
+    id_mssql,
+    access::object_traits_impl< ::review, id_mssql >::user_tag>
+  {
+    static const char table_name[];
+  };
+
+  template <>
+  struct query_columns_base< ::review, id_mssql >
+  {
+    // user
+    //
+    typedef
+    odb::alias_traits<
+      ::user,
+      id_mssql,
+      access::object_traits_impl< ::review, id_mssql >::user_tag>
+    user_alias_;
+  };
+
+  template <typename A>
+  struct query_columns< ::review, id_mssql, A >:
+    query_columns_base< ::review, id_mssql >
+  {
+    // id
+    //
+    typedef
+    mssql::query_column<
+      mssql::value_traits<
+        int,
+        mssql::id_int >::query_type,
+      mssql::id_int >
+    id_type_;
+
+    static const id_type_ id;
+
+    // business_id
+    //
+    typedef
+    mssql::query_column<
+      mssql::value_traits<
+        int,
+        mssql::id_int >::query_type,
+      mssql::id_int >
+    business_id_type_;
+
+    static const business_id_type_ business_id;
+
+    // user_id
+    //
+    typedef
+    mssql::query_column<
+      mssql::value_traits<
+        int,
+        mssql::id_int >::query_type,
+      mssql::id_int >
+    user_id_type_;
+
+    static const user_id_type_ user_id;
+
+    // user
+    //
+    typedef
+    mssql::query_column<
+      mssql::value_traits<
+        ::std::string,
+        mssql::id_string >::query_type,
+      mssql::id_string >
+    user_column_type_;
+
+    typedef
+    odb::query_pointer<
+      odb::pointer_query_columns<
+        ::user,
+        id_mssql,
+        user_alias_ > >
+    user_pointer_type_;
+
+    struct user_type_: user_pointer_type_, user_column_type_
+    {
+      user_type_ (const char* t,
+                  const char* c,
+                  const char* conv,
+                  unsigned short p = 0,
+                  unsigned short s = 0xFFFF)
+        : user_column_type_ (t, c, conv, p, s)
+      {
+      }
+    };
+
+    static const user_type_ user;
+  };
+
+  template <typename A>
+  const typename query_columns< ::review, id_mssql, A >::id_type_
+  query_columns< ::review, id_mssql, A >::
+  id (A::table_name, "[id]", 0);
+
+  template <typename A>
+  const typename query_columns< ::review, id_mssql, A >::business_id_type_
+  query_columns< ::review, id_mssql, A >::
+  business_id (A::table_name, "[business_id]", 0);
+
+  template <typename A>
+  const typename query_columns< ::review, id_mssql, A >::user_id_type_
+  query_columns< ::review, id_mssql, A >::
+  user_id (A::table_name, "[user_id]", 0);
+
+  template <typename A>
+  const typename query_columns< ::review, id_mssql, A >::user_type_
+  query_columns< ::review, id_mssql, A >::
+  user (A::table_name, "[user]", 0, 22);
+
+  // user
   //
 }
 

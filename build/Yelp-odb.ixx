@@ -28,19 +28,19 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (e);
   }
 
-  // attribute
+  // review
   //
 
   inline
-  access::object_traits< ::attribute >::id_type
-  access::object_traits< ::attribute >::
+  access::object_traits< ::review >::id_type
+  access::object_traits< ::review >::
   id (const object_type& o)
   {
-    return o.business_id;
+    return o.id;
   }
 
   inline
-  void access::object_traits< ::attribute >::
+  void access::object_traits< ::review >::
   callback (database& db, object_type& x, callback_event e)
   {
     ODB_POTENTIALLY_UNUSED (db);
@@ -49,7 +49,36 @@ namespace odb
   }
 
   inline
-  void access::object_traits< ::attribute >::
+  void access::object_traits< ::review >::
+  callback (database& db, const object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  // user
+  //
+
+  inline
+  access::object_traits< ::user >::id_type
+  access::object_traits< ::user >::
+  id (const object_type& o)
+  {
+    return o.id;
+  }
+
+  inline
+  void access::object_traits< ::user >::
+  callback (database& db, object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::user >::
   callback (database& db, const object_type& x, callback_event e)
   {
     ODB_POTENTIALLY_UNUSED (db);
@@ -66,11 +95,11 @@ namespace odb
   // LastQueryTime
   //
 
-  // attribute
+  // review
   //
 
   inline
-  void access::object_traits_impl< ::attribute, id_mssql >::
+  void access::object_traits_impl< ::review, id_mssql >::
   erase (database& db, const object_type& obj)
   {
     callback (db, obj, callback_event::pre_erase);
@@ -79,13 +108,25 @@ namespace odb
   }
 
   inline
-  void access::object_traits_impl< ::attribute, id_mssql >::
+  void access::object_traits_impl< ::review, id_mssql >::
   load_ (statements_type& sts,
          object_type& obj,
          bool)
   {
     ODB_POTENTIALLY_UNUSED (sts);
     ODB_POTENTIALLY_UNUSED (obj);
+  }
+
+  // user
+  //
+
+  inline
+  void access::object_traits_impl< ::user, id_mssql >::
+  erase (database& db, const object_type& obj)
+  {
+    callback (db, obj, callback_event::pre_erase);
+    erase (db, id (obj));
+    callback (db, obj, callback_event::post_erase);
   }
 }
 

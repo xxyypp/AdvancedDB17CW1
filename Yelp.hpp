@@ -29,6 +29,10 @@ public:
 // ---------------------------------------------
 // No need to change anything above this line
 // ---------------------------------------------
+
+class user;
+class review;
+/*
 #pragma db object
 class hours{
 public:
@@ -48,7 +52,7 @@ public:
 
     #pragma db not_null
      lazy_shared_ptr<hours> hours_;
-};
+};*/
 
 #pragma db object
 class review{
@@ -65,11 +69,11 @@ public:
 #pragma db object
 class user{
 public:
-#pragma db id
-    int id;
+#pragma db id column("id") type("VARCHAR(22)") not_null
+    string id;
 
 #pragma db value_not_null inverse(user_)
-    std::vector<lazy_weak_ptr<review> > review_;
+    std::vector<lazy_weak_ptr<review>> review_;
 };
 
 /*
