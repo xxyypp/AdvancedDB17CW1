@@ -61,26 +61,18 @@ std::vector<StarCount> countStars(odb::database& db, float latMin, float latMax,
 	// Your implementation goes here:
 	// db.query<StarCount>("select ...")
 	// Count the stars
-   // t.tracer(odb::stderr_tracer);
+    //t.tracer(odb::stderr_tracer);
     typedef odb::result<StarCount> res;
     std::stringstream ss;
-    ss << "SELECT r.stars AS stars, COUNT (CASE WHEN b.latitude <= " << latMax << endl
-       << "AND b.latitude >= " << latMin << "AND b.longitude <= " << longMax << endl
-       << " AND b.longitude >= " << longMin << endl
-       << "THEN r.stars ELSE NULL END) AS count" << endl
+    ss << "SELECT r.stars AS stars, COUNT (r.stars) AS count" << endl
        << "FROM [business] AS b, [review] AS r"  << endl
        << "WHERE b.id = r.business_id" << endl
+       << "AND b.latitude <= " << latMax << endl
+       << "AND b.latitude >= " << latMin << endl
+       << "AND b.longitude <= " << longMax << endl
+       << "AND b.longitude >= " << longMin << endl
        << "GROUP BY r.stars" << endl
        << "ORDER BY stars ASC" <<endl;
-    /*ss << "SELECT review.stars AS stars," << endl
-       << "COUNT( CASE WHEN business.latitude <" << latMax << "AND business.latitude >" <<  latMin << endl
-       << "AND business.longitude < "<<longMax<<" AND business.longitude > "<<longMin <<endl
-       << "THEN review.stars ELSE NULL END) AS count" << endl
-       << "FROM [business]," << endl
-       << "[review] " <<endl
-       << "WHERE business.id = review.business_id " << endl
-       << "GROUP BY review.stars " << endl
-       << "ORDER BY stars ASC " << endl;*/
 
 
     res r (db.query<StarCount>(ss.str()));
