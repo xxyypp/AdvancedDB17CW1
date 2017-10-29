@@ -70,24 +70,11 @@ public:
 
     #pragma db not_null
         std::shared_ptr<user> user_id;
-		//lazy_shared_ptr<user> user_;
+		//lazy_shared_ptr<user> user_id;
 
 	#pragma db not_null
 		//lazy_shared_ptr<business> business_;
         shared_ptr<business> business_id;
-
-
-//	const std::string& getId() {
-//		return id;
-//	}
-//
-//	const std::string& getBusiness_id() {
-//		return business_id;
-//	}
-//
-//	const std::string& getUser_id() {
-//		return user_id;
-//	}
 };
 
 
@@ -116,7 +103,7 @@ public:
 	    string hours;
 
     #pragma db not_null
-	    //lazy_shared_ptr<business> business_;
+	    //lazy_shared_ptr<business> business_id;
         shared_ptr<business> business_id;
 };
 

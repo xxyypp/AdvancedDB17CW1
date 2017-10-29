@@ -4,6 +4,8 @@
 #include <odb/database.hxx>
 #include <odb/mssql/database.hxx>
 #include <odb/transaction.hxx>
+//SQL query input
+#include <sstream>
 
 using std::cout;
 using std::endl;
@@ -23,20 +25,16 @@ std::vector<std::string> findHours(odb::database& db, std::string username) {
 	// Your implementation goes here:
 	// Find the hours
 /*----------------------------------------------------------------------------------------*/
-	/*t.tracer(odb::stderr_tracer);
-
-	typedef odb::result<user> res;*/
+	//t.tracer(odb::stderr_tracer);
+	/*typedef odb::result<user> res;*/
 /*----------------------------------------------------------------------------------------*/
 /*	user us;
     odb::lazy_shared_ptr<user> er (db.load<user> (us.id));
     reviews& es(er->reviews());
 */
 /*----------------------------------------------------------------------------------------*/
-	/*user us;
-	review rev;
-	odb::lazy_shared_ptr<user> userId (db.load<user> (us.id));
-	//review& re (userId->review());*/
-
+	//Success!
+/*
 	auto userRes = db.query<user> (query::name == username);
 	for (auto& userPtr:userRes){ //select the input username = query name
         for(auto& reviewPtr : userPtr.review_) {
@@ -45,8 +43,7 @@ std::vector<std::string> findHours(odb::database& db, std::string username) {
                 result.push_back(hourRes.load()->hours);
            }
         }
-    }
-
+    }*/
 /*----------------------------------------------------------------------------------------*/
 //	res matchUser (db.query<user> (query::name == username));
 //	for (res::iterator it (matchUser.begin ()); it != matchUser.end (); ++it){
@@ -64,6 +61,35 @@ std::vector<StarCount> countStars(odb::database& db, float latMin, float latMax,
 	// Your implementation goes here:
 	// db.query<StarCount>("select ...")
 	// Count the stars
+   // t.tracer(odb::stderr_tracer);
+    typedef odb::result<StarCount> res;
+    std::stringstream ss;
+    ss << "SELECT r.stars AS stars, COUNT (CASE WHEN b.latitude <= " << latMax << endl
+       << "AND b.latitude >= " << latMin << "AND b.longitude <= " << longMax << endl
+       << " AND b.longitude >= " << longMin << endl
+       << "THEN r.stars ELSE NULL END) AS count" << endl
+       << "FROM [business] AS b, [review] AS r"  << endl
+       << "WHERE b.id = r.business_id" << endl
+       << "GROUP BY r.stars" << endl
+       << "ORDER BY stars ASC" <<endl;
+    /*ss << "SELECT review.stars AS stars," << endl
+       << "COUNT( CASE WHEN business.latitude <" << latMax << "AND business.latitude >" <<  latMin << endl
+       << "AND business.longitude < "<<longMax<<" AND business.longitude > "<<longMin <<endl
+       << "THEN review.stars ELSE NULL END) AS count" << endl
+       << "FROM [business]," << endl
+       << "[review] " <<endl
+       << "WHERE business.id = review.business_id " << endl
+       << "GROUP BY review.stars " << endl
+       << "ORDER BY stars ASC " << endl;*/
+
+
+    res r (db.query<StarCount>(ss.str()));
+    for (auto it = r.begin(); it != r.end(); it++){
+        StarCount ans;
+        ans.stars = it->stars;
+        ans.count = it->count;
+        result.push_back(ans);
+    }
 	t.commit();
 	return result;
 }

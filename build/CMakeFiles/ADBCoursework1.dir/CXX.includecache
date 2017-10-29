@@ -33,6 +33,8 @@ odb/mssql/database.hxx
 -
 odb/transaction.hxx
 -
+sstream
+-
 
 /home/py715/AdvancedDB17CW1/build/Yelp-odb.cxx
 odb/pre.hxx
