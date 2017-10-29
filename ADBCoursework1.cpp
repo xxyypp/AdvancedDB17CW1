@@ -34,7 +34,7 @@ std::vector<std::string> findHours(odb::database& db, std::string username) {
 */
 /*----------------------------------------------------------------------------------------*/
 	//Success!
-/*
+
 	auto userRes = db.query<user> (query::name == username);
 	for (auto& userPtr:userRes){ //select the input username = query name
         for(auto& reviewPtr : userPtr.review_) {
@@ -43,7 +43,7 @@ std::vector<std::string> findHours(odb::database& db, std::string username) {
                 result.push_back(hourRes.load()->hours);
            }
         }
-    }*/
+    }
 /*----------------------------------------------------------------------------------------*/
 //	res matchUser (db.query<user> (query::name == username));
 //	for (res::iterator it (matchUser.begin ()); it != matchUser.end (); ++it){
@@ -73,6 +73,7 @@ std::vector<StarCount> countStars(odb::database& db, float latMin, float latMax,
        << "AND b.longitude >= " << longMin << endl
        << "GROUP BY r.stars" << endl
        << "ORDER BY stars ASC" <<endl;
+
 
 
     res r (db.query<StarCount>(ss.str()));
