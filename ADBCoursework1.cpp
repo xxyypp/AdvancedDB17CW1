@@ -15,13 +15,44 @@ using std::to_string;
 
 std::vector<std::string> findHours(odb::database& db, std::string username) {
 	std::vector<std::string> result;
+    typedef odb::query<user> query;//define a query for user
+/*----------------------------------------------------------------------------------------*/
+   // typedef std::vector<lazy_weak_ptr<review>> reviews;
+/*----------------------------------------------------------------------------------------*/
 	transaction t(db.begin());
 	// Your implementation goes here:
 	// Find the hours
-	auto res = db.query<user>(odb::query<user>::id.is_not_null());
-	for (auto& user : res)
-		cout << user->id;
+/*----------------------------------------------------------------------------------------*/
+	/*t.tracer(odb::stderr_tracer);
 
+	typedef odb::result<user> res;*/
+/*----------------------------------------------------------------------------------------*/
+/*	user us;
+    odb::lazy_shared_ptr<user> er (db.load<user> (us.id));
+    reviews& es(er->reviews());
+*/
+/*----------------------------------------------------------------------------------------*/
+	/*user us;
+	review rev;
+	odb::lazy_shared_ptr<user> userId (db.load<user> (us.id));
+	//review& re (userId->review());*/
+
+	auto userRes = db.query<user> (query::name == username);
+	for (auto& userPtr:userRes){ //select the input username = query name
+        for(auto& reviewPtr : userPtr.review_) {
+           auto businessIdPtr =  reviewPtr.load();
+           for(auto& hourRes:((businessIdPtr->business_id)->hours_)){
+                result.push_back(hourRes.load()->hours);
+           }
+        }
+    }
+
+/*----------------------------------------------------------------------------------------*/
+//	res matchUser (db.query<user> (query::name == username));
+//	for (res::iterator it (matchUser.begin ()); it != matchUser.end (); ++it){
+//		cout << it->getName() << std::endl;
+//	}
+/*----------------------------------------------------------------------------------------*/
 	t.commit();
 	return result;
 }

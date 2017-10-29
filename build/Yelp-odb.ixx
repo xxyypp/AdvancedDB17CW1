@@ -28,6 +28,35 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (e);
   }
 
+  // user
+  //
+
+  inline
+  access::object_traits< ::user >::id_type
+  access::object_traits< ::user >::
+  id (const object_type& o)
+  {
+    return o.id;
+  }
+
+  inline
+  void access::object_traits< ::user >::
+  callback (database& db, object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::user >::
+  callback (database& db, const object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
   // review
   //
 
@@ -57,19 +86,19 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (e);
   }
 
-  // user
+  // business
   //
 
   inline
-  access::object_traits< ::user >::id_type
-  access::object_traits< ::user >::
+  access::object_traits< ::business >::id_type
+  access::object_traits< ::business >::
   id (const object_type& o)
   {
     return o.id;
   }
 
   inline
-  void access::object_traits< ::user >::
+  void access::object_traits< ::business >::
   callback (database& db, object_type& x, callback_event e)
   {
     ODB_POTENTIALLY_UNUSED (db);
@@ -78,7 +107,36 @@ namespace odb
   }
 
   inline
-  void access::object_traits< ::user >::
+  void access::object_traits< ::business >::
+  callback (database& db, const object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  // hours
+  //
+
+  inline
+  access::object_traits< ::hours >::id_type
+  access::object_traits< ::hours >::
+  id (const object_type& o)
+  {
+    return o.id;
+  }
+
+  inline
+  void access::object_traits< ::hours >::
+  callback (database& db, object_type& x, callback_event e)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+    ODB_POTENTIALLY_UNUSED (x);
+    ODB_POTENTIALLY_UNUSED (e);
+  }
+
+  inline
+  void access::object_traits< ::hours >::
   callback (database& db, const object_type& x, callback_event e)
   {
     ODB_POTENTIALLY_UNUSED (db);
@@ -94,6 +152,18 @@ namespace odb
 
   // LastQueryTime
   //
+
+  // user
+  //
+
+  inline
+  void access::object_traits_impl< ::user, id_mssql >::
+  erase (database& db, const object_type& obj)
+  {
+    callback (db, obj, callback_event::pre_erase);
+    erase (db, id (obj));
+    callback (db, obj, callback_event::post_erase);
+  }
 
   // review
   //
@@ -117,16 +187,38 @@ namespace odb
     ODB_POTENTIALLY_UNUSED (obj);
   }
 
-  // user
+  // business
   //
 
   inline
-  void access::object_traits_impl< ::user, id_mssql >::
+  void access::object_traits_impl< ::business, id_mssql >::
   erase (database& db, const object_type& obj)
   {
     callback (db, obj, callback_event::pre_erase);
     erase (db, id (obj));
     callback (db, obj, callback_event::post_erase);
+  }
+
+  // hours
+  //
+
+  inline
+  void access::object_traits_impl< ::hours, id_mssql >::
+  erase (database& db, const object_type& obj)
+  {
+    callback (db, obj, callback_event::pre_erase);
+    erase (db, id (obj));
+    callback (db, obj, callback_event::post_erase);
+  }
+
+  inline
+  void access::object_traits_impl< ::hours, id_mssql >::
+  load_ (statements_type& sts,
+         object_type& obj,
+         bool)
+  {
+    ODB_POTENTIALLY_UNUSED (sts);
+    ODB_POTENTIALLY_UNUSED (obj);
   }
 }
 

@@ -264,13 +264,777 @@ namespace odb
     return result<view_type> (r);
   }
 
+  // user
+  //
+
+  struct access::object_traits_impl< ::user, id_mssql >::extra_statement_cache_type
+  {
+    mssql::container_statements_impl< review_traits > review_;
+
+    extra_statement_cache_type (
+      mssql::connection& c,
+      image_type&,
+      id_image_type&,
+      mssql::binding& id,
+      mssql::binding&)
+    : review_ (c, id)
+    {
+    }
+  };
+
+  // review_
+  //
+
+  const char access::object_traits_impl< ::user, id_mssql >::review_traits::
+  select_statement[] =
+  "SELECT "
+  "[review].[id] "
+  "FROM [review] "
+  "WHERE [review].[user_id]=?";
+
+  const char access::object_traits_impl< ::user, id_mssql >::review_traits::
+  insert_statement[] =
+  "";
+
+  const char access::object_traits_impl< ::user, id_mssql >::review_traits::
+  delete_statement[] =
+  "";
+
+  void access::object_traits_impl< ::user, id_mssql >::review_traits::
+  bind (mssql::bind* b,
+        const mssql::bind* id,
+        std::size_t id_size,
+        data_image_type& d)
+  {
+    using namespace mssql;
+
+    statement_kind sk (statement_select);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+
+    // value
+    //
+    b[n].type = mssql::bind::string;
+    b[n].buffer = &d.value_value;
+    b[n].size_ind = &d.value_size_ind;
+    b[n].capacity = static_cast<SQLLEN> (sizeof (d.value_value));
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::review_traits::
+  init (value_type& v,
+        const data_image_type& i,
+        database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // value
+    //
+    {
+      typedef object_traits< ::review > obj_traits;
+      typedef odb::pointer_traits< value_type > ptr_traits;
+
+      if (i.value_size_ind == SQL_NULL_DATA)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        mssql::value_traits<
+            obj_traits::id_type,
+            mssql::id_string >::set_value (
+          id,
+          i.value_value,
+          static_cast<std::size_t> (i.value_size_ind),
+          i.value_size_ind == SQL_NULL_DATA);
+
+        v = ptr_traits::pointer_type (
+          *static_cast<mssql::database*> (db), id);
+      }
+    }
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::review_traits::
+  insert (index_type, const value_type&, void*)
+  {
+  }
+
+  bool access::object_traits_impl< ::user, id_mssql >::review_traits::
+  select (index_type&, value_type& v, void* d)
+  {
+    using namespace mssql;
+    using mssql::select_statement;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    data_image_type& di (sts.data_image ());
+
+    init (v, di, &sts.connection ().database ());
+
+    sts.select_statement ().stream_result ();
+
+    select_statement& st (sts.select_statement ());
+    select_statement::result r (st.fetch ());
+    return r != select_statement::no_data;
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::review_traits::
+  delete_ (void*)
+  {
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::review_traits::
+  load (container_type& c,
+        statements_type& sts)
+  {
+    using namespace mssql;
+    using mssql::select_statement;
+
+    const binding& id (sts.id_binding ());
+
+    if (sts.data_binding_test_version ())
+    {
+      bind (sts.data_bind (), id.bind, id.count, sts.data_image ());
+      sts.data_binding_update_version ();
+    }
+
+    select_statement& st (sts.select_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+    bool more (r != select_statement::no_data);
+
+    functions_type& fs (sts.functions ());
+    fs.ordered_ = false;
+    container_traits_type::load (c, more, fs);
+  }
+
+  access::object_traits_impl< ::user, id_mssql >::id_type
+  access::object_traits_impl< ::user, id_mssql >::
+  id (const image_type& i)
+  {
+    mssql::database* db (0);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    id_type id;
+    {
+      mssql::value_traits<
+          ::std::string,
+          mssql::id_string >::set_value (
+        id,
+        i.id_value,
+        static_cast<std::size_t> (i.id_size_ind),
+        i.id_size_ind == SQL_NULL_DATA);
+    }
+
+    return id;
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::
+  bind (mssql::bind* b,
+        image_type& i,
+        mssql::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace mssql;
+
+    std::size_t n (0);
+
+    // id
+    //
+    if (sk != statement_update)
+    {
+      b[n].type = mssql::bind::string;
+      b[n].buffer = &i.id_value;
+      b[n].size_ind = &i.id_size_ind;
+      b[n].capacity = static_cast<SQLLEN> (sizeof (i.id_value));
+      n++;
+    }
+
+    // name
+    //
+    b[n].type = mssql::bind::string;
+    b[n].buffer = &i.name_value;
+    b[n].size_ind = &i.name_size_ind;
+    b[n].capacity = static_cast<SQLLEN> (sizeof (i.name_value));
+    n++;
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::
+  bind (mssql::bind* b, id_image_type& i)
+  {
+    std::size_t n (0);
+    b[n].type = mssql::bind::string;
+    b[n].buffer = &i.id_value;
+    b[n].size_ind = &i.id_size_ind;
+    b[n].capacity = static_cast<SQLLEN> (sizeof (i.id_value));
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::
+  init (image_type& i,
+        const object_type& o,
+        mssql::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace mssql;
+
+    if (i.change_callback_.callback != 0)
+      (i.change_callback_.callback) (i.change_callback_.context);
+
+    // id
+    //
+    if (sk == statement_insert)
+    {
+      ::std::string const& v =
+        o.id;
+
+      bool is_null (false);
+      std::size_t size (0);
+      mssql::value_traits<
+          ::std::string,
+          mssql::id_string >::set_image (
+        i.id_value,
+        sizeof (i.id_value) - 1,
+        size,
+        is_null,
+        v);
+      i.id_size_ind =
+        is_null ? SQL_NULL_DATA : static_cast<SQLLEN> (size);
+    }
+
+    // name
+    //
+    {
+      ::std::string const& v =
+        o.name;
+
+      bool is_null (false);
+      std::size_t size (0);
+      mssql::value_traits<
+          ::std::string,
+          mssql::id_string >::set_image (
+        i.name_value,
+        sizeof (i.name_value) - 1,
+        size,
+        is_null,
+        v);
+      i.name_size_ind =
+        is_null ? SQL_NULL_DATA : static_cast<SQLLEN> (size);
+    }
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::
+  init (object_type& o,
+        const image_type& i,
+        database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // id
+    //
+    {
+      ::std::string& v =
+        o.id;
+
+      mssql::value_traits<
+          ::std::string,
+          mssql::id_string >::set_value (
+        v,
+        i.id_value,
+        static_cast<std::size_t> (i.id_size_ind),
+        i.id_size_ind == SQL_NULL_DATA);
+    }
+
+    // name
+    //
+    {
+      ::std::string& v =
+        o.name;
+
+      mssql::value_traits<
+          ::std::string,
+          mssql::id_string >::set_value (
+        v,
+        i.name_value,
+        static_cast<std::size_t> (i.name_size_ind),
+        i.name_size_ind == SQL_NULL_DATA);
+    }
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::
+  init (id_image_type& i, const id_type& id)
+  {
+    {
+      bool is_null (false);
+      std::size_t size (0);
+      mssql::value_traits<
+          ::std::string,
+          mssql::id_string >::set_image (
+        i.id_value,
+        sizeof (i.id_value) - 1,
+        size,
+        is_null,
+        id);
+      i.id_size_ind =
+        is_null ? SQL_NULL_DATA : static_cast<SQLLEN> (size);
+    }
+  }
+
+  const char access::object_traits_impl< ::user, id_mssql >::persist_statement[] =
+  "INSERT INTO [user] "
+  "([id], "
+  "[name]) "
+  "VALUES "
+  "(?, ?)";
+
+  const char access::object_traits_impl< ::user, id_mssql >::find_statement[] =
+  "SELECT "
+  "[user].[id], "
+  "[user].[name] "
+  "FROM [user] "
+  "WHERE [user].[id]=?";
+
+  const char access::object_traits_impl< ::user, id_mssql >::update_statement[] =
+  "UPDATE [user] "
+  "SET "
+  "[name]=? "
+  "WHERE [id]=?";
+
+  const char access::object_traits_impl< ::user, id_mssql >::erase_statement[] =
+  "DELETE FROM [user] "
+  "WHERE [id]=?";
+
+  const char access::object_traits_impl< ::user, id_mssql >::query_statement[] =
+  "SELECT "
+  "[user].[id], "
+  "[user].[name] "
+  "FROM [user]";
+
+  const char access::object_traits_impl< ::user, id_mssql >::erase_query_statement[] =
+  "DELETE FROM [user]";
+
+  const char access::object_traits_impl< ::user, id_mssql >::table_name[] =
+  "[user]";
+
+  void access::object_traits_impl< ::user, id_mssql >::
+  persist (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace mssql;
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    callback (db,
+              obj,
+              callback_event::pre_persist);
+
+    image_type& im (sts.image ());
+    binding& imb (sts.insert_image_binding ());
+
+    init (im, obj, statement_insert);
+
+    if (im.version != sts.insert_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_insert);
+      sts.insert_image_version (im.version);
+      imb.version++;
+    }
+
+    insert_statement& st (sts.persist_statement ());
+    if (!st.execute ())
+      throw object_already_persistent ();
+
+    callback (db,
+              obj,
+              callback_event::post_persist);
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::
+  update (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace mssql;
+    using mssql::update_statement;
+
+    callback (db, obj, callback_event::pre_update);
+
+    mssql::transaction& tr (mssql::transaction::current ());
+    mssql::connection& conn (tr.connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    const id_type& id (
+      obj.id);
+    id_image_type& idi (sts.id_image ());
+    init (idi, id);
+
+    image_type& im (sts.image ());
+    init (im, obj, statement_update);
+
+    bool u (false);
+    binding& imb (sts.update_image_binding ());
+    if (im.version != sts.update_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_update);
+      sts.update_image_version (im.version);
+      imb.version++;
+      u = true;
+    }
+
+    binding& idb (sts.id_image_binding ());
+    if (idi.version != sts.update_id_image_version () ||
+        idb.version == 0)
+    {
+      if (idi.version != sts.id_image_version () ||
+          idb.version == 0)
+      {
+        bind (idb.bind, idi);
+        sts.id_image_version (idi.version);
+        idb.version++;
+      }
+
+      sts.update_id_image_version (idi.version);
+
+      if (!u)
+        imb.version++;
+    }
+
+    update_statement& st (sts.update_statement ());
+    if (st.execute () == 0)
+      throw object_not_persistent ();
+
+    callback (db, obj, callback_event::post_update);
+    pointer_cache_traits::update (db, obj);
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::
+  erase (database& db, const id_type& id)
+  {
+    using namespace mssql;
+
+    ODB_POTENTIALLY_UNUSED (db);
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    if (sts.erase_statement ().execute () != 1)
+      throw object_not_persistent ();
+
+    pointer_cache_traits::erase (db, id);
+  }
+
+  access::object_traits_impl< ::user, id_mssql >::pointer_type
+  access::object_traits_impl< ::user, id_mssql >::
+  find (database& db, const id_type& id)
+  {
+    using namespace mssql;
+
+    {
+      pointer_type p (pointer_cache_traits::find (db, id));
+
+      if (!pointer_traits::null_ptr (p))
+        return p;
+    }
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+    auto_result ar;
+
+    if (l.locked ())
+    {
+      if (!find_ (sts, &id))
+        return pointer_type ();
+
+      ar.set (sts.find_statement ());
+    }
+
+    pointer_type p (
+      access::object_factory<object_type, pointer_type>::create ());
+    pointer_traits::guard pg (p);
+
+    pointer_cache_traits::insert_guard ig (
+      pointer_cache_traits::insert (db, id, p));
+
+    object_type& obj (pointer_traits::get_ref (p));
+
+    if (l.locked ())
+    {
+      select_statement& st (sts.find_statement ());
+      ODB_POTENTIALLY_UNUSED (st);
+
+      callback (db, obj, callback_event::pre_load);
+      init (obj, sts.image (), &db);
+      st.stream_result ();
+      ar.free ();
+      load_ (sts, obj, false);
+      sts.load_delayed (0);
+      l.unlock ();
+      callback (db, obj, callback_event::post_load);
+      pointer_cache_traits::load (ig.position ());
+    }
+    else
+      sts.delay_load (id, obj, ig.position ());
+
+    ig.release ();
+    pg.release ();
+    return p;
+  }
+
+  bool access::object_traits_impl< ::user, id_mssql >::
+  find (database& db, const id_type& id, object_type& obj)
+  {
+    using namespace mssql;
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    auto_result ar (st);
+    reference_cache_traits::position_type pos (
+      reference_cache_traits::insert (db, id, obj));
+    reference_cache_traits::insert_guard ig (pos);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    st.stream_result ();
+    ar.free ();
+    load_ (sts, obj, false);
+    sts.load_delayed (0);
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    reference_cache_traits::load (pos);
+    ig.release ();
+    return true;
+  }
+
+  bool access::object_traits_impl< ::user, id_mssql >::
+  reload (database& db, object_type& obj)
+  {
+    using namespace mssql;
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    const id_type& id  (
+      obj.id);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    auto_result ar (st);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    st.stream_result ();
+    ar.free ();
+    load_ (sts, obj, true);
+    sts.load_delayed (0);
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    return true;
+  }
+
+  bool access::object_traits_impl< ::user, id_mssql >::
+  find_ (statements_type& sts,
+         const id_type* id)
+  {
+    using namespace mssql;
+
+    id_image_type& i (sts.id_image ());
+    init (i, *id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    select_statement& st (sts.find_statement ());
+
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+
+    if (r != select_statement::no_data)
+    {
+      ar.release ();
+      return true;
+    }
+    else
+      return false;
+  }
+
+  void access::object_traits_impl< ::user, id_mssql >::
+  load_ (statements_type& sts,
+         object_type& obj,
+         bool reload)
+  {
+    ODB_POTENTIALLY_UNUSED (reload);
+
+    extra_statement_cache_type& esc (sts.extra_statement_cache ());
+
+    // review_
+    //
+    {
+      ::std::vector< ::odb::lazy_ptr< ::review > >& v =
+        obj.review_;
+
+      review_traits::load (
+        v,
+        esc.review_);
+    }
+  }
+
+  result< access::object_traits_impl< ::user, id_mssql >::object_type >
+  access::object_traits_impl< ::user, id_mssql >::
+  query (database&, const query_base_type& q)
+  {
+    using namespace mssql;
+    using odb::details::shared;
+    using odb::details::shared_ptr;
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    std::string text (query_statement);
+    if (!q.empty ())
+    {
+      text += " ";
+      text += q.clause ();
+    }
+
+    q.init_parameters ();
+    shared_ptr<select_statement> st (
+      new (shared) select_statement (
+        conn,
+        text,
+        false,
+        true,
+        q.parameters_binding (),
+        imb));
+
+    st->execute ();
+
+    shared_ptr< odb::object_result_impl<object_type> > r (
+      new (shared) mssql::object_result_impl<object_type> (
+        q, st, sts, 0));
+
+    return result<object_type> (r);
+  }
+
+  unsigned long long access::object_traits_impl< ::user, id_mssql >::
+  erase_query (database&, const query_base_type& q)
+  {
+    using namespace mssql;
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+
+    std::string text (erase_query_statement);
+    if (!q.empty ())
+    {
+      text += ' ';
+      text += q.clause ();
+    }
+
+    q.init_parameters ();
+    delete_statement st (
+      conn,
+      text,
+      q.parameters_binding ());
+
+    return st.execute ();
+  }
+
   // review
   //
 
   const char alias_traits<  ::user,
     id_mssql,
-    access::object_traits_impl< ::review, id_mssql >::user_tag>::
-  table_name[] = "[user]";
+    access::object_traits_impl< ::review, id_mssql >::user_id_tag>::
+  table_name[] = "[user_id]";
+
+  const char alias_traits<  ::business,
+    id_mssql,
+    access::object_traits_impl< ::review, id_mssql >::business_id_tag>::
+  table_name[] = "[business_id]";
 
   struct access::object_traits_impl< ::review, id_mssql >::extra_statement_cache_type
   {
@@ -294,10 +1058,11 @@ namespace odb
     id_type id;
     {
       mssql::value_traits<
-          int,
-          mssql::id_int >::set_value (
+          ::std::string,
+          mssql::id_string >::set_value (
         id,
         i.id_value,
+        static_cast<std::size_t> (i.id_size_ind),
         i.id_size_ind == SQL_NULL_DATA);
     }
 
@@ -319,32 +1084,27 @@ namespace odb
     //
     if (sk != statement_update)
     {
-      b[n].type = mssql::bind::int_;
+      b[n].type = mssql::bind::string;
       b[n].buffer = &i.id_value;
       b[n].size_ind = &i.id_size_ind;
+      b[n].capacity = static_cast<SQLLEN> (sizeof (i.id_value));
       n++;
     }
 
-    // business_id
-    //
-    b[n].type = mssql::bind::int_;
-    b[n].buffer = &i.business_id_value;
-    b[n].size_ind = &i.business_id_size_ind;
-    n++;
-
     // user_id
     //
-    b[n].type = mssql::bind::int_;
+    b[n].type = mssql::bind::string;
     b[n].buffer = &i.user_id_value;
     b[n].size_ind = &i.user_id_size_ind;
+    b[n].capacity = static_cast<SQLLEN> (sizeof (i.user_id_value));
     n++;
 
-    // user_
+    // business_id
     //
     b[n].type = mssql::bind::string;
-    b[n].buffer = &i.user_value;
-    b[n].size_ind = &i.user_size_ind;
-    b[n].capacity = static_cast<SQLLEN> (sizeof (i.user_value));
+    b[n].buffer = &i.business_id_value;
+    b[n].size_ind = &i.business_id_size_ind;
+    b[n].capacity = static_cast<SQLLEN> (sizeof (i.business_id_value));
     n++;
   }
 
@@ -352,9 +1112,10 @@ namespace odb
   bind (mssql::bind* b, id_image_type& i)
   {
     std::size_t n (0);
-    b[n].type = mssql::bind::int_;
+    b[n].type = mssql::bind::string;
     b[n].buffer = &i.id_value;
     b[n].size_ind = &i.id_size_ind;
+    b[n].capacity = static_cast<SQLLEN> (sizeof (i.id_value));
   }
 
   void access::object_traits_impl< ::review, id_mssql >::
@@ -375,70 +1136,79 @@ namespace odb
     //
     if (sk == statement_insert)
     {
-      int const& v =
+      ::std::string const& v =
         o.id;
 
       bool is_null (false);
+      std::size_t size (0);
       mssql::value_traits<
-          int,
-          mssql::id_int >::set_image (
-        i.id_value, is_null, v);
-      i.id_size_ind = is_null ? SQL_NULL_DATA : 0;
-    }
-
-    // business_id
-    //
-    {
-      int const& v =
-        o.business_id;
-
-      bool is_null (false);
-      mssql::value_traits<
-          int,
-          mssql::id_int >::set_image (
-        i.business_id_value, is_null, v);
-      i.business_id_size_ind = is_null ? SQL_NULL_DATA : 0;
+          ::std::string,
+          mssql::id_string >::set_image (
+        i.id_value,
+        sizeof (i.id_value) - 1,
+        size,
+        is_null,
+        v);
+      i.id_size_ind =
+        is_null ? SQL_NULL_DATA : static_cast<SQLLEN> (size);
     }
 
     // user_id
     //
     {
-      int const& v =
+      ::std::shared_ptr< ::user > const& v =
         o.user_id;
 
-      bool is_null (false);
-      mssql::value_traits<
-          int,
-          mssql::id_int >::set_image (
-        i.user_id_value, is_null, v);
-      i.user_id_size_ind = is_null ? SQL_NULL_DATA : 0;
-    }
-
-    // user_
-    //
-    {
-      ::odb::lazy_shared_ptr< ::user > const& v =
-        o.user_;
-
       typedef object_traits< ::user > obj_traits;
-      typedef odb::pointer_traits< ::odb::lazy_shared_ptr< ::user > > ptr_traits;
+      typedef odb::pointer_traits< ::std::shared_ptr< ::user > > ptr_traits;
 
       bool is_null (ptr_traits::null_ptr (v));
       if (!is_null)
       {
         const obj_traits::id_type& id (
-          ptr_traits::object_id< ptr_traits::element_type  > (v));
+          obj_traits::id (ptr_traits::get_ref (v)));
 
         std::size_t size (0);
         mssql::value_traits<
             obj_traits::id_type,
             mssql::id_string >::set_image (
-          i.user_value,
-          sizeof (i.user_value) - 1,
+          i.user_id_value,
+          sizeof (i.user_id_value) - 1,
           size,
           is_null,
           id);
-        i.user_size_ind =
+        i.user_id_size_ind =
+          is_null ? SQL_NULL_DATA : static_cast<SQLLEN> (size);
+      }
+      else
+        throw null_pointer ();
+    }
+
+    // business_id
+    //
+    {
+      ::std::shared_ptr< ::business > const& v =
+        o.business_id;
+
+      typedef object_traits< ::business > obj_traits;
+      typedef odb::pointer_traits< ::std::shared_ptr< ::business > > ptr_traits;
+
+      bool is_null (ptr_traits::null_ptr (v));
+      if (!is_null)
+      {
+        const obj_traits::id_type& id (
+          obj_traits::id (ptr_traits::get_ref (v)));
+
+        std::size_t size (0);
+        mssql::value_traits<
+            obj_traits::id_type,
+            mssql::id_string >::set_image (
+          i.business_id_value,
+          sizeof (i.business_id_value) - 1,
+          size,
+          is_null,
+          id);
+        i.business_id_size_ind =
           is_null ? SQL_NULL_DATA : static_cast<SQLLEN> (size);
       }
       else
@@ -458,55 +1228,28 @@ namespace odb
     // id
     //
     {
-      int& v =
+      ::std::string& v =
         o.id;
 
       mssql::value_traits<
-          int,
-          mssql::id_int >::set_value (
+          ::std::string,
+          mssql::id_string >::set_value (
         v,
         i.id_value,
+        static_cast<std::size_t> (i.id_size_ind),
         i.id_size_ind == SQL_NULL_DATA);
-    }
-
-    // business_id
-    //
-    {
-      int& v =
-        o.business_id;
-
-      mssql::value_traits<
-          int,
-          mssql::id_int >::set_value (
-        v,
-        i.business_id_value,
-        i.business_id_size_ind == SQL_NULL_DATA);
     }
 
     // user_id
     //
     {
-      int& v =
+      ::std::shared_ptr< ::user >& v =
         o.user_id;
 
-      mssql::value_traits<
-          int,
-          mssql::id_int >::set_value (
-        v,
-        i.user_id_value,
-        i.user_id_size_ind == SQL_NULL_DATA);
-    }
-
-    // user_
-    //
-    {
-      ::odb::lazy_shared_ptr< ::user >& v =
-        o.user_;
-
       typedef object_traits< ::user > obj_traits;
-      typedef odb::pointer_traits< ::odb::lazy_shared_ptr< ::user > > ptr_traits;
+      typedef odb::pointer_traits< ::std::shared_ptr< ::user > > ptr_traits;
 
-      if (i.user_size_ind == SQL_NULL_DATA)
+      if (i.user_id_size_ind == SQL_NULL_DATA)
         v = ptr_traits::pointer_type ();
       else
       {
@@ -515,12 +1258,49 @@ namespace odb
             obj_traits::id_type,
             mssql::id_string >::set_value (
           id,
-          i.user_value,
-          static_cast<std::size_t> (i.user_size_ind),
-          i.user_size_ind == SQL_NULL_DATA);
+          i.user_id_value,
+          static_cast<std::size_t> (i.user_id_size_ind),
+          i.user_id_size_ind == SQL_NULL_DATA);
 
+        // If a compiler error points to the line below, then
+        // it most likely means that a pointer used in a member
+        // cannot be initialized from an object pointer.
+        //
         v = ptr_traits::pointer_type (
-          *static_cast<mssql::database*> (db), id);
+          static_cast<mssql::database*> (db)->load<
+            obj_traits::object_type > (id));
+      }
+    }
+
+    // business_id
+    //
+    {
+      ::std::shared_ptr< ::business >& v =
+        o.business_id;
+
+      typedef object_traits< ::business > obj_traits;
+      typedef odb::pointer_traits< ::std::shared_ptr< ::business > > ptr_traits;
+
+      if (i.business_id_size_ind == SQL_NULL_DATA)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        mssql::value_traits<
+            obj_traits::id_type,
+            mssql::id_string >::set_value (
+          id,
+          i.business_id_value,
+          static_cast<std::size_t> (i.business_id_size_ind),
+          i.business_id_size_ind == SQL_NULL_DATA);
+
+        // If a compiler error points to the line below, then
+        // it most likely means that a pointer used in a member
+        // cannot be initialized from an object pointer.
+        //
+        v = ptr_traits::pointer_type (
+          static_cast<mssql::database*> (db)->load<
+            obj_traits::object_type > (id));
       }
     }
   }
@@ -530,38 +1310,41 @@ namespace odb
   {
     {
       bool is_null (false);
+      std::size_t size (0);
       mssql::value_traits<
-          int,
-          mssql::id_int >::set_image (
-        i.id_value, is_null, id);
-      i.id_size_ind = is_null ? SQL_NULL_DATA : 0;
+          ::std::string,
+          mssql::id_string >::set_image (
+        i.id_value,
+        sizeof (i.id_value) - 1,
+        size,
+        is_null,
+        id);
+      i.id_size_ind =
+        is_null ? SQL_NULL_DATA : static_cast<SQLLEN> (size);
     }
   }
 
   const char access::object_traits_impl< ::review, id_mssql >::persist_statement[] =
   "INSERT INTO [review] "
   "([id], "
-  "[business_id], "
   "[user_id], "
-  "[user]) "
+  "[business_id]) "
   "VALUES "
-  "(?, ?, ?, ?)";
+  "(?, ?, ?)";
 
   const char access::object_traits_impl< ::review, id_mssql >::find_statement[] =
   "SELECT "
   "[review].[id], "
-  "[review].[business_id], "
   "[review].[user_id], "
-  "[review].[user] "
+  "[review].[business_id] "
   "FROM [review] "
   "WHERE [review].[id]=?";
 
   const char access::object_traits_impl< ::review, id_mssql >::update_statement[] =
   "UPDATE [review] "
   "SET "
-  "[business_id]=?, "
   "[user_id]=?, "
-  "[user]=? "
+  "[business_id]=? "
   "WHERE [id]=?";
 
   const char access::object_traits_impl< ::review, id_mssql >::erase_statement[] =
@@ -571,11 +1354,11 @@ namespace odb
   const char access::object_traits_impl< ::review, id_mssql >::query_statement[] =
   "SELECT\n"
   "[review].[id],\n"
-  "[review].[business_id],\n"
   "[review].[user_id],\n"
-  "[review].[user]\n"
+  "[review].[business_id]\n"
   "FROM [review]\n"
-  "LEFT JOIN [user] AS [user] ON [user].[id]=[review].[user]";
+  "LEFT JOIN [user] AS [user_id] ON [user_id].[id]=[review].[user_id]\n"
+  "LEFT JOIN [business] AS [business_id] ON [business_id].[id]=[review].[business_id]";
 
   const char access::object_traits_impl< ::review, id_mssql >::erase_query_statement[] =
   "DELETE FROM [review]";
@@ -959,12 +1742,13 @@ namespace odb
     return st.execute ();
   }
 
-  // user
+  // business
   //
 
-  struct access::object_traits_impl< ::user, id_mssql >::extra_statement_cache_type
+  struct access::object_traits_impl< ::business, id_mssql >::extra_statement_cache_type
   {
     mssql::container_statements_impl< review_traits > review_;
+    mssql::container_statements_impl< hours_traits > hours_;
 
     extra_statement_cache_type (
       mssql::connection& c,
@@ -972,7 +1756,8 @@ namespace odb
       id_image_type&,
       mssql::binding& id,
       mssql::binding&)
-    : review_ (c, id)
+    : review_ (c, id),
+      hours_ (c, id)
     {
     }
   };
@@ -980,22 +1765,22 @@ namespace odb
   // review_
   //
 
-  const char access::object_traits_impl< ::user, id_mssql >::review_traits::
+  const char access::object_traits_impl< ::business, id_mssql >::review_traits::
   select_statement[] =
   "SELECT "
   "[review].[id] "
   "FROM [review] "
-  "WHERE [review].[user]=?";
+  "WHERE [review].[business_id]=?";
 
-  const char access::object_traits_impl< ::user, id_mssql >::review_traits::
+  const char access::object_traits_impl< ::business, id_mssql >::review_traits::
   insert_statement[] =
   "";
 
-  const char access::object_traits_impl< ::user, id_mssql >::review_traits::
+  const char access::object_traits_impl< ::business, id_mssql >::review_traits::
   delete_statement[] =
   "";
 
-  void access::object_traits_impl< ::user, id_mssql >::review_traits::
+  void access::object_traits_impl< ::business, id_mssql >::review_traits::
   bind (mssql::bind* b,
         const mssql::bind* id,
         std::size_t id_size,
@@ -1016,12 +1801,13 @@ namespace odb
 
     // value
     //
-    b[n].type = mssql::bind::int_;
+    b[n].type = mssql::bind::string;
     b[n].buffer = &d.value_value;
     b[n].size_ind = &d.value_size_ind;
+    b[n].capacity = static_cast<SQLLEN> (sizeof (d.value_value));
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::review_traits::
+  void access::object_traits_impl< ::business, id_mssql >::review_traits::
   init (value_type& v,
         const data_image_type& i,
         database* db)
@@ -1041,9 +1827,10 @@ namespace odb
         obj_traits::id_type id;
         mssql::value_traits<
             obj_traits::id_type,
-            mssql::id_int >::set_value (
+            mssql::id_string >::set_value (
           id,
           i.value_value,
+          static_cast<std::size_t> (i.value_size_ind),
           i.value_size_ind == SQL_NULL_DATA);
 
         v = ptr_traits::pointer_type (
@@ -1052,12 +1839,12 @@ namespace odb
     }
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::review_traits::
+  void access::object_traits_impl< ::business, id_mssql >::review_traits::
   insert (index_type, const value_type&, void*)
   {
   }
 
-  bool access::object_traits_impl< ::user, id_mssql >::review_traits::
+  bool access::object_traits_impl< ::business, id_mssql >::review_traits::
   select (index_type&, value_type& v, void* d)
   {
     using namespace mssql;
@@ -1075,12 +1862,12 @@ namespace odb
     return r != select_statement::no_data;
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::review_traits::
+  void access::object_traits_impl< ::business, id_mssql >::review_traits::
   delete_ (void*)
   {
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::review_traits::
+  void access::object_traits_impl< ::business, id_mssql >::review_traits::
   load (container_type& c,
         statements_type& sts)
   {
@@ -1106,8 +1893,137 @@ namespace odb
     container_traits_type::load (c, more, fs);
   }
 
-  access::object_traits_impl< ::user, id_mssql >::id_type
-  access::object_traits_impl< ::user, id_mssql >::
+  // hours_
+  //
+
+  const char access::object_traits_impl< ::business, id_mssql >::hours_traits::
+  select_statement[] =
+  "SELECT "
+  "[hours].[id] "
+  "FROM [hours] "
+  "WHERE [hours].[business_id]=?";
+
+  const char access::object_traits_impl< ::business, id_mssql >::hours_traits::
+  insert_statement[] =
+  "";
+
+  const char access::object_traits_impl< ::business, id_mssql >::hours_traits::
+  delete_statement[] =
+  "";
+
+  void access::object_traits_impl< ::business, id_mssql >::hours_traits::
+  bind (mssql::bind* b,
+        const mssql::bind* id,
+        std::size_t id_size,
+        data_image_type& d)
+  {
+    using namespace mssql;
+
+    statement_kind sk (statement_select);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    size_t n (0);
+
+    // object_id
+    //
+    if (id != 0)
+      std::memcpy (&b[n], id, id_size * sizeof (id[0]));
+    n += id_size;
+
+    // value
+    //
+    b[n].type = mssql::bind::int_;
+    b[n].buffer = &d.value_value;
+    b[n].size_ind = &d.value_size_ind;
+  }
+
+  void access::object_traits_impl< ::business, id_mssql >::hours_traits::
+  init (value_type& v,
+        const data_image_type& i,
+        database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // value
+    //
+    {
+      typedef object_traits< ::hours > obj_traits;
+      typedef odb::pointer_traits< value_type > ptr_traits;
+
+      if (i.value_size_ind == SQL_NULL_DATA)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        mssql::value_traits<
+            obj_traits::id_type,
+            mssql::id_int >::set_value (
+          id,
+          i.value_value,
+          i.value_size_ind == SQL_NULL_DATA);
+
+        v = ptr_traits::pointer_type (
+          *static_cast<mssql::database*> (db), id);
+      }
+    }
+  }
+
+  void access::object_traits_impl< ::business, id_mssql >::hours_traits::
+  insert (index_type, const value_type&, void*)
+  {
+  }
+
+  bool access::object_traits_impl< ::business, id_mssql >::hours_traits::
+  select (index_type&, value_type& v, void* d)
+  {
+    using namespace mssql;
+    using mssql::select_statement;
+
+    statements_type& sts (*static_cast< statements_type* > (d));
+    data_image_type& di (sts.data_image ());
+
+    init (v, di, &sts.connection ().database ());
+
+    sts.select_statement ().stream_result ();
+
+    select_statement& st (sts.select_statement ());
+    select_statement::result r (st.fetch ());
+    return r != select_statement::no_data;
+  }
+
+  void access::object_traits_impl< ::business, id_mssql >::hours_traits::
+  delete_ (void*)
+  {
+  }
+
+  void access::object_traits_impl< ::business, id_mssql >::hours_traits::
+  load (container_type& c,
+        statements_type& sts)
+  {
+    using namespace mssql;
+    using mssql::select_statement;
+
+    const binding& id (sts.id_binding ());
+
+    if (sts.data_binding_test_version ())
+    {
+      bind (sts.data_bind (), id.bind, id.count, sts.data_image ());
+      sts.data_binding_update_version ();
+    }
+
+    select_statement& st (sts.select_statement ());
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+    bool more (r != select_statement::no_data);
+
+    functions_type& fs (sts.functions ());
+    fs.ordered_ = false;
+    container_traits_type::load (c, more, fs);
+  }
+
+  access::object_traits_impl< ::business, id_mssql >::id_type
+  access::object_traits_impl< ::business, id_mssql >::
   id (const image_type& i)
   {
     mssql::database* db (0);
@@ -1127,7 +2043,7 @@ namespace odb
     return id;
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::
+  void access::object_traits_impl< ::business, id_mssql >::
   bind (mssql::bind* b,
         image_type& i,
         mssql::statement_kind sk)
@@ -1150,7 +2066,7 @@ namespace odb
     }
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::
+  void access::object_traits_impl< ::business, id_mssql >::
   bind (mssql::bind* b, id_image_type& i)
   {
     std::size_t n (0);
@@ -1160,7 +2076,7 @@ namespace odb
     b[n].capacity = static_cast<SQLLEN> (sizeof (i.id_value));
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::
+  void access::object_traits_impl< ::business, id_mssql >::
   init (image_type& i,
         const object_type& o,
         mssql::statement_kind sk)
@@ -1196,7 +2112,7 @@ namespace odb
     }
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::
+  void access::object_traits_impl< ::business, id_mssql >::
   init (object_type& o,
         const image_type& i,
         database* db)
@@ -1221,7 +2137,7 @@ namespace odb
     }
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::
+  void access::object_traits_impl< ::business, id_mssql >::
   init (id_image_type& i, const id_type& id)
   {
     {
@@ -1240,34 +2156,34 @@ namespace odb
     }
   }
 
-  const char access::object_traits_impl< ::user, id_mssql >::persist_statement[] =
-  "INSERT INTO [user] "
+  const char access::object_traits_impl< ::business, id_mssql >::persist_statement[] =
+  "INSERT INTO [business] "
   "([id]) "
   "VALUES "
   "(?)";
 
-  const char access::object_traits_impl< ::user, id_mssql >::find_statement[] =
+  const char access::object_traits_impl< ::business, id_mssql >::find_statement[] =
   "SELECT "
-  "[user].[id] "
-  "FROM [user] "
-  "WHERE [user].[id]=?";
+  "[business].[id] "
+  "FROM [business] "
+  "WHERE [business].[id]=?";
 
-  const char access::object_traits_impl< ::user, id_mssql >::erase_statement[] =
-  "DELETE FROM [user] "
+  const char access::object_traits_impl< ::business, id_mssql >::erase_statement[] =
+  "DELETE FROM [business] "
   "WHERE [id]=?";
 
-  const char access::object_traits_impl< ::user, id_mssql >::query_statement[] =
+  const char access::object_traits_impl< ::business, id_mssql >::query_statement[] =
   "SELECT "
-  "[user].[id] "
-  "FROM [user]";
+  "[business].[id] "
+  "FROM [business]";
 
-  const char access::object_traits_impl< ::user, id_mssql >::erase_query_statement[] =
-  "DELETE FROM [user]";
+  const char access::object_traits_impl< ::business, id_mssql >::erase_query_statement[] =
+  "DELETE FROM [business]";
 
-  const char access::object_traits_impl< ::user, id_mssql >::table_name[] =
-  "[user]";
+  const char access::object_traits_impl< ::business, id_mssql >::table_name[] =
+  "[business]";
 
-  void access::object_traits_impl< ::user, id_mssql >::
+  void access::object_traits_impl< ::business, id_mssql >::
   persist (database& db, const object_type& obj)
   {
     ODB_POTENTIALLY_UNUSED (db);
@@ -1305,7 +2221,7 @@ namespace odb
               callback_event::post_persist);
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::
+  void access::object_traits_impl< ::business, id_mssql >::
   update (database& db, const object_type& obj)
   {
     ODB_POTENTIALLY_UNUSED (db);
@@ -1319,7 +2235,7 @@ namespace odb
     pointer_cache_traits::update (db, obj);
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::
+  void access::object_traits_impl< ::business, id_mssql >::
   erase (database& db, const id_type& id)
   {
     using namespace mssql;
@@ -1348,8 +2264,8 @@ namespace odb
     pointer_cache_traits::erase (db, id);
   }
 
-  access::object_traits_impl< ::user, id_mssql >::pointer_type
-  access::object_traits_impl< ::user, id_mssql >::
+  access::object_traits_impl< ::business, id_mssql >::pointer_type
+  access::object_traits_impl< ::business, id_mssql >::
   find (database& db, const id_type& id)
   {
     using namespace mssql;
@@ -1409,7 +2325,7 @@ namespace odb
     return p;
   }
 
-  bool access::object_traits_impl< ::user, id_mssql >::
+  bool access::object_traits_impl< ::business, id_mssql >::
   find (database& db, const id_type& id, object_type& obj)
   {
     using namespace mssql;
@@ -1445,7 +2361,7 @@ namespace odb
     return true;
   }
 
-  bool access::object_traits_impl< ::user, id_mssql >::
+  bool access::object_traits_impl< ::business, id_mssql >::
   reload (database& db, object_type& obj)
   {
     using namespace mssql;
@@ -1479,7 +2395,7 @@ namespace odb
     return true;
   }
 
-  bool access::object_traits_impl< ::user, id_mssql >::
+  bool access::object_traits_impl< ::business, id_mssql >::
   find_ (statements_type& sts,
          const id_type* id)
   {
@@ -1522,7 +2438,7 @@ namespace odb
       return false;
   }
 
-  void access::object_traits_impl< ::user, id_mssql >::
+  void access::object_traits_impl< ::business, id_mssql >::
   load_ (statements_type& sts,
          object_type& obj,
          bool reload)
@@ -1534,17 +2450,28 @@ namespace odb
     // review_
     //
     {
-      ::std::vector< ::odb::lazy_weak_ptr< ::review > >& v =
+      ::std::vector< ::odb::lazy_ptr< ::review > >& v =
         obj.review_;
 
       review_traits::load (
         v,
         esc.review_);
     }
+
+    // hours_
+    //
+    {
+      ::std::vector< ::odb::lazy_ptr< ::hours > >& v =
+        obj.hours_;
+
+      hours_traits::load (
+        v,
+        esc.hours_);
+    }
   }
 
-  result< access::object_traits_impl< ::user, id_mssql >::object_type >
-  access::object_traits_impl< ::user, id_mssql >::
+  result< access::object_traits_impl< ::business, id_mssql >::object_type >
+  access::object_traits_impl< ::business, id_mssql >::
   query (database&, const query_base_type& q)
   {
     using namespace mssql;
@@ -1594,7 +2521,676 @@ namespace odb
     return result<object_type> (r);
   }
 
-  unsigned long long access::object_traits_impl< ::user, id_mssql >::
+  unsigned long long access::object_traits_impl< ::business, id_mssql >::
+  erase_query (database&, const query_base_type& q)
+  {
+    using namespace mssql;
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+
+    std::string text (erase_query_statement);
+    if (!q.empty ())
+    {
+      text += ' ';
+      text += q.clause ();
+    }
+
+    q.init_parameters ();
+    delete_statement st (
+      conn,
+      text,
+      q.parameters_binding ());
+
+    return st.execute ();
+  }
+
+  // hours
+  //
+
+  const char alias_traits<  ::business,
+    id_mssql,
+    access::object_traits_impl< ::hours, id_mssql >::business_id_tag>::
+  table_name[] = "[business_id]";
+
+  struct access::object_traits_impl< ::hours, id_mssql >::extra_statement_cache_type
+  {
+    extra_statement_cache_type (
+      mssql::connection&,
+      image_type&,
+      id_image_type&,
+      mssql::binding&,
+      mssql::binding&)
+    {
+    }
+  };
+
+  access::object_traits_impl< ::hours, id_mssql >::id_type
+  access::object_traits_impl< ::hours, id_mssql >::
+  id (const image_type& i)
+  {
+    mssql::database* db (0);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    id_type id;
+    {
+      mssql::value_traits<
+          int,
+          mssql::id_int >::set_value (
+        id,
+        i.id_value,
+        i.id_size_ind == SQL_NULL_DATA);
+    }
+
+    return id;
+  }
+
+  void access::object_traits_impl< ::hours, id_mssql >::
+  bind (mssql::bind* b,
+        image_type& i,
+        mssql::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace mssql;
+
+    std::size_t n (0);
+
+    // id
+    //
+    if (sk != statement_update)
+    {
+      b[n].type = mssql::bind::int_;
+      b[n].buffer = &i.id_value;
+      b[n].size_ind = &i.id_size_ind;
+      n++;
+    }
+
+    // hours
+    //
+    b[n].type = mssql::bind::string;
+    b[n].buffer = &i.hours_value;
+    b[n].size_ind = &i.hours_size_ind;
+    b[n].capacity = static_cast<SQLLEN> (sizeof (i.hours_value));
+    n++;
+
+    // business_id
+    //
+    b[n].type = mssql::bind::string;
+    b[n].buffer = &i.business_id_value;
+    b[n].size_ind = &i.business_id_size_ind;
+    b[n].capacity = static_cast<SQLLEN> (sizeof (i.business_id_value));
+    n++;
+  }
+
+  void access::object_traits_impl< ::hours, id_mssql >::
+  bind (mssql::bind* b, id_image_type& i)
+  {
+    std::size_t n (0);
+    b[n].type = mssql::bind::int_;
+    b[n].buffer = &i.id_value;
+    b[n].size_ind = &i.id_size_ind;
+  }
+
+  void access::object_traits_impl< ::hours, id_mssql >::
+  init (image_type& i,
+        const object_type& o,
+        mssql::statement_kind sk)
+  {
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (sk);
+
+    using namespace mssql;
+
+    if (i.change_callback_.callback != 0)
+      (i.change_callback_.callback) (i.change_callback_.context);
+
+    // id
+    //
+    if (sk == statement_insert)
+    {
+      int const& v =
+        o.id;
+
+      bool is_null (false);
+      mssql::value_traits<
+          int,
+          mssql::id_int >::set_image (
+        i.id_value, is_null, v);
+      i.id_size_ind = is_null ? SQL_NULL_DATA : 0;
+    }
+
+    // hours
+    //
+    {
+      ::std::string const& v =
+        o.hours;
+
+      bool is_null (false);
+      std::size_t size (0);
+      mssql::value_traits<
+          ::std::string,
+          mssql::id_string >::set_image (
+        i.hours_value,
+        sizeof (i.hours_value) - 1,
+        size,
+        is_null,
+        v);
+      i.hours_size_ind =
+        is_null ? SQL_NULL_DATA : static_cast<SQLLEN> (size);
+    }
+
+    // business_id
+    //
+    {
+      ::std::shared_ptr< ::business > const& v =
+        o.business_id;
+
+      typedef object_traits< ::business > obj_traits;
+      typedef odb::pointer_traits< ::std::shared_ptr< ::business > > ptr_traits;
+
+      bool is_null (ptr_traits::null_ptr (v));
+      if (!is_null)
+      {
+        const obj_traits::id_type& id (
+          obj_traits::id (ptr_traits::get_ref (v)));
+
+        std::size_t size (0);
+        mssql::value_traits<
+            obj_traits::id_type,
+            mssql::id_string >::set_image (
+          i.business_id_value,
+          sizeof (i.business_id_value) - 1,
+          size,
+          is_null,
+          id);
+        i.business_id_size_ind =
+          is_null ? SQL_NULL_DATA : static_cast<SQLLEN> (size);
+      }
+      else
+        throw null_pointer ();
+    }
+  }
+
+  void access::object_traits_impl< ::hours, id_mssql >::
+  init (object_type& o,
+        const image_type& i,
+        database* db)
+  {
+    ODB_POTENTIALLY_UNUSED (o);
+    ODB_POTENTIALLY_UNUSED (i);
+    ODB_POTENTIALLY_UNUSED (db);
+
+    // id
+    //
+    {
+      int& v =
+        o.id;
+
+      mssql::value_traits<
+          int,
+          mssql::id_int >::set_value (
+        v,
+        i.id_value,
+        i.id_size_ind == SQL_NULL_DATA);
+    }
+
+    // hours
+    //
+    {
+      ::std::string& v =
+        o.hours;
+
+      mssql::value_traits<
+          ::std::string,
+          mssql::id_string >::set_value (
+        v,
+        i.hours_value,
+        static_cast<std::size_t> (i.hours_size_ind),
+        i.hours_size_ind == SQL_NULL_DATA);
+    }
+
+    // business_id
+    //
+    {
+      ::std::shared_ptr< ::business >& v =
+        o.business_id;
+
+      typedef object_traits< ::business > obj_traits;
+      typedef odb::pointer_traits< ::std::shared_ptr< ::business > > ptr_traits;
+
+      if (i.business_id_size_ind == SQL_NULL_DATA)
+        v = ptr_traits::pointer_type ();
+      else
+      {
+        obj_traits::id_type id;
+        mssql::value_traits<
+            obj_traits::id_type,
+            mssql::id_string >::set_value (
+          id,
+          i.business_id_value,
+          static_cast<std::size_t> (i.business_id_size_ind),
+          i.business_id_size_ind == SQL_NULL_DATA);
+
+        // If a compiler error points to the line below, then
+        // it most likely means that a pointer used in a member
+        // cannot be initialized from an object pointer.
+        //
+        v = ptr_traits::pointer_type (
+          static_cast<mssql::database*> (db)->load<
+            obj_traits::object_type > (id));
+      }
+    }
+  }
+
+  void access::object_traits_impl< ::hours, id_mssql >::
+  init (id_image_type& i, const id_type& id)
+  {
+    {
+      bool is_null (false);
+      mssql::value_traits<
+          int,
+          mssql::id_int >::set_image (
+        i.id_value, is_null, id);
+      i.id_size_ind = is_null ? SQL_NULL_DATA : 0;
+    }
+  }
+
+  const char access::object_traits_impl< ::hours, id_mssql >::persist_statement[] =
+  "INSERT INTO [hours] "
+  "([id], "
+  "[hours], "
+  "[business_id]) "
+  "VALUES "
+  "(?, ?, ?)";
+
+  const char access::object_traits_impl< ::hours, id_mssql >::find_statement[] =
+  "SELECT "
+  "[hours].[id], "
+  "[hours].[hours], "
+  "[hours].[business_id] "
+  "FROM [hours] "
+  "WHERE [hours].[id]=?";
+
+  const char access::object_traits_impl< ::hours, id_mssql >::update_statement[] =
+  "UPDATE [hours] "
+  "SET "
+  "[hours]=?, "
+  "[business_id]=? "
+  "WHERE [id]=?";
+
+  const char access::object_traits_impl< ::hours, id_mssql >::erase_statement[] =
+  "DELETE FROM [hours] "
+  "WHERE [id]=?";
+
+  const char access::object_traits_impl< ::hours, id_mssql >::query_statement[] =
+  "SELECT\n"
+  "[hours].[id],\n"
+  "[hours].[hours],\n"
+  "[hours].[business_id]\n"
+  "FROM [hours]\n"
+  "LEFT JOIN [business] AS [business_id] ON [business_id].[id]=[hours].[business_id]";
+
+  const char access::object_traits_impl< ::hours, id_mssql >::erase_query_statement[] =
+  "DELETE FROM [hours]";
+
+  const char access::object_traits_impl< ::hours, id_mssql >::table_name[] =
+  "[hours]";
+
+  void access::object_traits_impl< ::hours, id_mssql >::
+  persist (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace mssql;
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    callback (db,
+              obj,
+              callback_event::pre_persist);
+
+    image_type& im (sts.image ());
+    binding& imb (sts.insert_image_binding ());
+
+    init (im, obj, statement_insert);
+
+    if (im.version != sts.insert_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_insert);
+      sts.insert_image_version (im.version);
+      imb.version++;
+    }
+
+    insert_statement& st (sts.persist_statement ());
+    if (!st.execute ())
+      throw object_already_persistent ();
+
+    callback (db,
+              obj,
+              callback_event::post_persist);
+  }
+
+  void access::object_traits_impl< ::hours, id_mssql >::
+  update (database& db, const object_type& obj)
+  {
+    ODB_POTENTIALLY_UNUSED (db);
+
+    using namespace mssql;
+    using mssql::update_statement;
+
+    callback (db, obj, callback_event::pre_update);
+
+    mssql::transaction& tr (mssql::transaction::current ());
+    mssql::connection& conn (tr.connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    const id_type& id (
+      obj.id);
+    id_image_type& idi (sts.id_image ());
+    init (idi, id);
+
+    image_type& im (sts.image ());
+    init (im, obj, statement_update);
+
+    bool u (false);
+    binding& imb (sts.update_image_binding ());
+    if (im.version != sts.update_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_update);
+      sts.update_image_version (im.version);
+      imb.version++;
+      u = true;
+    }
+
+    binding& idb (sts.id_image_binding ());
+    if (idi.version != sts.update_id_image_version () ||
+        idb.version == 0)
+    {
+      if (idi.version != sts.id_image_version () ||
+          idb.version == 0)
+      {
+        bind (idb.bind, idi);
+        sts.id_image_version (idi.version);
+        idb.version++;
+      }
+
+      sts.update_id_image_version (idi.version);
+
+      if (!u)
+        imb.version++;
+    }
+
+    update_statement& st (sts.update_statement ());
+    if (st.execute () == 0)
+      throw object_not_persistent ();
+
+    callback (db, obj, callback_event::post_update);
+    pointer_cache_traits::update (db, obj);
+  }
+
+  void access::object_traits_impl< ::hours, id_mssql >::
+  erase (database& db, const id_type& id)
+  {
+    using namespace mssql;
+
+    ODB_POTENTIALLY_UNUSED (db);
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    id_image_type& i (sts.id_image ());
+    init (i, id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    if (sts.erase_statement ().execute () != 1)
+      throw object_not_persistent ();
+
+    pointer_cache_traits::erase (db, id);
+  }
+
+  access::object_traits_impl< ::hours, id_mssql >::pointer_type
+  access::object_traits_impl< ::hours, id_mssql >::
+  find (database& db, const id_type& id)
+  {
+    using namespace mssql;
+
+    {
+      pointer_type p (pointer_cache_traits::find (db, id));
+
+      if (!pointer_traits::null_ptr (p))
+        return p;
+    }
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+    auto_result ar;
+
+    if (l.locked ())
+    {
+      if (!find_ (sts, &id))
+        return pointer_type ();
+
+      ar.set (sts.find_statement ());
+    }
+
+    pointer_type p (
+      access::object_factory<object_type, pointer_type>::create ());
+    pointer_traits::guard pg (p);
+
+    pointer_cache_traits::insert_guard ig (
+      pointer_cache_traits::insert (db, id, p));
+
+    object_type& obj (pointer_traits::get_ref (p));
+
+    if (l.locked ())
+    {
+      select_statement& st (sts.find_statement ());
+      ODB_POTENTIALLY_UNUSED (st);
+
+      callback (db, obj, callback_event::pre_load);
+      init (obj, sts.image (), &db);
+      st.stream_result ();
+      ar.free ();
+      load_ (sts, obj, false);
+      sts.load_delayed (0);
+      l.unlock ();
+      callback (db, obj, callback_event::post_load);
+      pointer_cache_traits::load (ig.position ());
+    }
+    else
+      sts.delay_load (id, obj, ig.position ());
+
+    ig.release ();
+    pg.release ();
+    return p;
+  }
+
+  bool access::object_traits_impl< ::hours, id_mssql >::
+  find (database& db, const id_type& id, object_type& obj)
+  {
+    using namespace mssql;
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    auto_result ar (st);
+    reference_cache_traits::position_type pos (
+      reference_cache_traits::insert (db, id, obj));
+    reference_cache_traits::insert_guard ig (pos);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    st.stream_result ();
+    ar.free ();
+    load_ (sts, obj, false);
+    sts.load_delayed (0);
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    reference_cache_traits::load (pos);
+    ig.release ();
+    return true;
+  }
+
+  bool access::object_traits_impl< ::hours, id_mssql >::
+  reload (database& db, object_type& obj)
+  {
+    using namespace mssql;
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    statements_type::auto_lock l (sts);
+
+    const id_type& id  (
+      obj.id);
+
+    if (!find_ (sts, &id))
+      return false;
+
+    select_statement& st (sts.find_statement ());
+    ODB_POTENTIALLY_UNUSED (st);
+
+    auto_result ar (st);
+
+    callback (db, obj, callback_event::pre_load);
+    init (obj, sts.image (), &db);
+    st.stream_result ();
+    ar.free ();
+    load_ (sts, obj, true);
+    sts.load_delayed (0);
+    l.unlock ();
+    callback (db, obj, callback_event::post_load);
+    return true;
+  }
+
+  bool access::object_traits_impl< ::hours, id_mssql >::
+  find_ (statements_type& sts,
+         const id_type* id)
+  {
+    using namespace mssql;
+
+    id_image_type& i (sts.id_image ());
+    init (i, *id);
+
+    binding& idb (sts.id_image_binding ());
+    if (i.version != sts.id_image_version () || idb.version == 0)
+    {
+      bind (idb.bind, i);
+      sts.id_image_version (i.version);
+      idb.version++;
+    }
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    select_statement& st (sts.find_statement ());
+
+    st.execute ();
+    auto_result ar (st);
+    select_statement::result r (st.fetch ());
+
+    if (r != select_statement::no_data)
+    {
+      ar.release ();
+      return true;
+    }
+    else
+      return false;
+  }
+
+  result< access::object_traits_impl< ::hours, id_mssql >::object_type >
+  access::object_traits_impl< ::hours, id_mssql >::
+  query (database&, const query_base_type& q)
+  {
+    using namespace mssql;
+    using odb::details::shared;
+    using odb::details::shared_ptr;
+
+    mssql::connection& conn (
+      mssql::transaction::current ().connection ());
+
+    statements_type& sts (
+      conn.statement_cache ().find_object<object_type> ());
+
+    image_type& im (sts.image ());
+    binding& imb (sts.select_image_binding ());
+
+    if (im.version != sts.select_image_version () ||
+        imb.version == 0)
+    {
+      bind (imb.bind, im, statement_select);
+      sts.select_image_version (im.version);
+      imb.version++;
+    }
+
+    std::string text (query_statement);
+    if (!q.empty ())
+    {
+      text += "\n";
+      text += q.clause ();
+    }
+
+    q.init_parameters ();
+    shared_ptr<select_statement> st (
+      new (shared) select_statement (
+        conn,
+        text,
+        true,
+        true,
+        q.parameters_binding (),
+        imb));
+
+    st->execute ();
+
+    shared_ptr< odb::object_result_impl<object_type> > r (
+      new (shared) mssql::object_result_impl<object_type> (
+        q, st, sts, 0));
+
+    return result<object_type> (r);
+  }
+
+  unsigned long long access::object_traits_impl< ::hours, id_mssql >::
   erase_query (database&, const query_base_type& q)
   {
     using namespace mssql;
