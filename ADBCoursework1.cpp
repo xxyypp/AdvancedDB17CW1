@@ -93,7 +93,7 @@ void createIndex(odb::database& db){
 	// create a columnstore index to accelerate your query
     transaction t(db.begin());
     t.tracer(odb::stderr_tracer);
-	db.execute("CREATE INDEX Review_index ON review(stars, business_id)");
+	db.execute("CREATE COLUMNSTORE INDEX Review_index ON review(stars, business_id)");
     t.commit();
 
 }
