@@ -91,7 +91,9 @@ void createIndex(odb::database& db){
 	// Your implementation goes here:
 	// don't forget to wrap it in a transaction
 	// create a columnstore index to accelerate your query
-	db.execute("CREATE INDEX ind ON business(id, latitude,longitude)");
+    transaction t(db.begin());
+	db.execute("CREATE INDEX Review_index ON business(id, latitude,longitude)");
+    t.commit();
 
 }
 
@@ -99,7 +101,9 @@ void dropIndex(odb::database& db){
 	// Your implementation goes here:
 	// don't forget to wrap it in a transaction
 	// drop the columnstore index you've created
-    db.execute("DROP INDEX ind ON business");
+    transaction t(db.begin());
+    db.execute("DROP INDEX Review_index ON business");
+    t.commit();
 }
 
 // ---------------------------------------------
