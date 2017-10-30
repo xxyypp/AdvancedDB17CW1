@@ -1,0 +1,32 @@
+-------------------------------------
+Start to build the project!
+-------------------------------------
+[  0%] Built target ODBHeaders
+Scanning dependencies of target ADBCoursework1
+[ 33%] Building CXX object CMakeFiles/ADBCoursework1.dir/ADBCoursework1.cpp.o
+[ 66%] Building CXX object CMakeFiles/ADBCoursework1.dir/Yelp-odb.cxx.o
+[100%] Linking CXX executable ADBCoursework1
+[100%] Built target ADBCoursework1
+Finished build...
+ 
+-------------------------------------
+Run the project...
+-------------------------------------
+findHours Test 1: passed
+findHours Test 2: passed
+findHours Test 3: passed
+countStars Test 1: passed
+countStars Test 2: passed
+Run number 0 time before indexing: 1713572
+Run number 1 time before indexing: 1632824
+Run number 2 time before indexing: 1675242
+Run number 3 time before indexing: 1665239
+Run number 4 time before indexing: 1622851
+ Run number 0 time after indexing: 549381
+ Run number 1 time after indexing: 566054
+ Run number 2 time after indexing: 550184
+ Run number 3 time after indexing: 598896
+ Run number 4 time after indexing: 556979
+
+ 
+Finshed...
