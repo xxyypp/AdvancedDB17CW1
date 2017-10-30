@@ -1,0 +1,7 @@
+C:\Users\浦\.CLion2017.2\system\cygwin_cmake\bin\cmake.exe -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /cygdrive/c/Users/浦/Desktop/AdvancedDB17CW1
+CMake Error: Could not find CMAKE_ROOT !!!
+CMake has most likely not been installed correctly.
+Modules directory not found in
+
+CMake Error: Error executing cmake::LoadCache(). Aborting.
+
