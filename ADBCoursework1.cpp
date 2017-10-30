@@ -91,7 +91,7 @@ void createIndex(odb::database& db){
 	// Your implementation goes here:
 	// don't forget to wrap it in a transaction
 	// create a columnstore index to accelerate your query
-	db.execute("CREATE CLUSTERED COLUMNSTORE INDEX ind ON business(id, latitude,longitude)");
+	db.execute("CREATE INDEX ind ON business(id, latitude,longitude)");
 
 }
 
