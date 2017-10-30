@@ -99,7 +99,7 @@ void dropIndex(odb::database& db){
 	// Your implementation goes here:
 	// don't forget to wrap it in a transaction
 	// drop the columnstore index you've created
-    db.execute("DROP INDEX STARCOUNT on business");
+    db.execute("DROP INDEX STARCOUNT on review");
 }
 
 // ---------------------------------------------
