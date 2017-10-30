@@ -42,7 +42,7 @@
         <entry file="file://$PROJECT_DIR$/ADBCoursework1.cpp">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="364">
-              <caret line="101" column="47" lean-forward="true" selection-start-line="101" selection-start-column="47" selection-end-line="101" selection-end-column="47" />
+              <caret line="101" column="31" lean-forward="false" selection-start-line="101" selection-start-column="31" selection-end-line="101" selection-end-column="31" />
               <folding />
             </state>
           </provider>
@@ -132,12 +132,12 @@
       <updated>1509379691322</updated>
       <workItem from="1509379692881" duration="1208000" />
       <workItem from="1509381434987" duration="1705000" />
-      <workItem from="1509388968611" duration="1193000" />
+      <workItem from="1509388968611" duration="1206000" />
     </task>
     <servers />
   </component>
   <component name="TimeTrackingManager">
-    <option name="totallyTimeSpent" value="4106000" />
+    <option name="totallyTimeSpent" value="4119000" />
   </component>
   <component name="ToolWindowManager">
     <frame x="-7" y="0" width="974" height="1047" extended-state="0" />
@@ -194,7 +194,7 @@
     <entry file="file://$PROJECT_DIR$/ADBCoursework1.cpp">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="364">
-          <caret line="101" column="47" lean-forward="true" selection-start-line="101" selection-start-column="47" selection-end-line="101" selection-end-column="47" />
+          <caret line="101" column="31" lean-forward="false" selection-start-line="101" selection-start-column="31" selection-end-line="101" selection-end-column="31" />
           <folding />
         </state>
       </provider>
