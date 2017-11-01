@@ -1,0 +1,8 @@
+Compared to the difference with/without Columnstore Indexing, there was a significant improvement
+of the performance when using the Columnstore Indexing. From the result, the average cost without
+indexing was 1661945.6, whereas the average cost for Columnsotre Indexing was 564298.8. Columnstore
+Indexing was around 3 times faster than the case without indexing.
+
+As in the first case without columnstore indexing, the data was stored in row, hence there will cost
+many I/O when querying
+
