@@ -1,8 +1,21 @@
-Compared to the difference with/without Columnstore Indexing, there was a significant improvement
+Normally database store data in row, different kinds of data are stored together. In this case, the
+size of the Yelp database are significant large. When querying, a lot of records in the database were
+accessed.Compared to the difference with/without Columnstore Indexing, there was a significant improvement
 of the performance when using the Columnstore Indexing. From the result, the average cost without
-indexing was 1661945.6, whereas the average cost for Columnsotre Indexing was 564298.8. Columnstore
-Indexing was around 3 times faster than the case without indexing.
+indexing was 1661945.6, whereas the average cost using Columnsotre Indexing was 564298.8. Columnstore
+Indexing was around 3 times faster than the case without columnstore indexing. In columnstore indexing,
+the rows are converted to column segment first, then they will be divided into row groups. Each group
+will be encoded,compressed and stored into memory. A directory will update the location of each segment,
+so when querying, the segment can be find and located quickly and easily. For columnstore indexing, it
+has better encoding and compression methods that can reduce the I/O times.
 
-As in the first case without columnstore indexing, the data was stored in row, hence there will cost
-many I/O when querying
+By storing the data in columns, which means the same kind of data are stored together in a page in memory.
+Different columns are stored in different pages. When querying, the number of access of data from
+the memory space can be reduced; which means the number of I/O scans in the memory locations were
+reduced, thus it can improved the efficiency.In this case, if we use columnstore indexing, we only access the memory
+location we needed such as id,business_id, customer_id in review, but not other data like text, useful,
+funny ect. .
+
+
+
 
